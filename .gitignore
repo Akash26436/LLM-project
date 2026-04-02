@@ -1,10 +1,12 @@
 # Python
 __pycache__/
 *.pyc
+*.db
 
 # Environment
 .env
 venv/
+.venv/
 
 # VectorDB Data
 chroma_db/
@@ -12,3 +14,6 @@ user_profile.json
 
 # Session Files
 frontend/.memorypal_session.json
+
+# Logs
+pip_err.log

@@ -22,12 +22,19 @@ pinecone
 psycopg2-binary
 sqlalchemy
 
+# --- Backend framework ---
+fastapi
+uvicorn
+python-jose
+passlib[bcrypt]
+
 # --- File Loaders ---
 PyMuPDF
 
 # --- NLP Tools ---
-spacy==3.8.0
-en_core_web_sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+# spacy==3.8.0
+# en_core_web_sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+
 
 # --- Utilities ---
 python-dotenv

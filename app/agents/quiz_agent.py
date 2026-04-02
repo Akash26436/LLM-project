@@ -46,28 +46,37 @@ class QuizAgent:
             print(f"❌ Quiz generation failed: {e}")
             return "Error: Unable to generate quiz."
 
-    def evaluate_answers(self, subject: str, user_answers: dict, quiz_text: str) -> str:
+    def evaluate_answers(self, subject: str, user_answers: dict, quiz_text: str, quiz_type: str = "mcq") -> str:
         """
         Evaluates user answers against correct ones inferred from quiz text.
+        Supports mcq, subjective, and coding.
         """
+        eval_rules = ""
+        if quiz_type == "mcq":
+            eval_rules = "Evaluate which options are correct/incorrect."
+        elif quiz_type in ["subjective", "coding"]:
+            eval_rules = "Provide detailed feedback on the student's solution, highlighting strengths and weaknesses."
+
         prompt = f"""
         You are MemoryPalAI's quiz evaluator.
 
         Subject: {subject}
+        Quiz Type: {quiz_type}
 
-        Here is the quiz:
+        Here is the quiz/assignment:
         {quiz_text}
 
-        Here are the user's selected answers:
+        Here are the user's answers/submissions:
         {user_answers}
 
+        {eval_rules}
+
         Evaluate:
-        1. Which answers are correct or incorrect
-        2. Provide total score out of total questions
+        2. Provide total score out of total questions / max score
         3. List topics the user should revise based on mistakes
 
         Format clearly as:
-        - Q1: Correct/Incorrect + brief reason
+        - Result: [Detailed breakdown]
         - Final Score: x / y
         - Topics to revise: [list]
         """

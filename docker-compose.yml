@@ -14,5 +14,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  web:
+    build: .
+    container_name: memorypal_web
+    ports:
+      - "8501:8501"
+    env_file: .env # Use .env to pass the API keys and everything
+    depends_on:
+      - postgres_db
+
 volumes:
   postgres_data:

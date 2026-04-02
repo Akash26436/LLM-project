@@ -3,13 +3,9 @@ import os
 import json
 import time
 import re
-import spacy
 from app.services.llm_service import get_llm, generate_with_retry
 # --- 1. IMPORT THE NEW STYLE DETECTOR ---
 from app.services.style_detector import detect_style_from_text
-
-# ensure user installed en_core_web_sm: python -m spacy download en_core_web_sm
-nlp = spacy.load("en_core_web_sm")
 
 class OrganizerAgent:
     """
@@ -121,33 +117,10 @@ Text:
         return t
 
     def _spacy_fallback(self, text: str, graph_only=False):
-        doc = nlp(text)
-        nodes = []
-        seen = set()
-        for ent in doc.ents:
-            key = ent.text.strip()
-            if key and key not in seen:
-                nodes.append({"id": key, "type": ent.label_})
-                seen.add(key)
-        for nc in doc.noun_chunks:
-            key = nc.text.strip()
-            if len(key) > 3 and key not in seen:
-                nodes.append({"id": key, "type": "Phrase"})
-                seen.add(key)
-        edges = []
-        sentences = list(doc.sents)
-        for sent in sentences:
-            present = [n["id"] for n in nodes if n["id"] in sent.text]
-            for i in range(len(present)):
-                for j in range(i+1, len(present)):
-                    edges.append({"source": present[i], "target": present[j], "label": "related_to"})
-        
+        print("⚠️ Spacy is disabled on Python 3.15. Fallback extraction limited.")
         if graph_only:
-            return {"nodes": nodes, "edges": edges}
-
-        subject = nodes[0]["id"] if nodes else "Unknown"
-        style = "Descriptive"
-        return {"nodes": nodes, "edges": edges, "subject": subject, "style": style}
+            return {"nodes": [], "edges": []}
+        return {"nodes": [], "edges": [], "subject": "Unknown", "style": "Descriptive"}
 
     # --- THIS IS THE MISSING FUNCTION ---
     def _split_text(self, text: str, max_chunk_size: int = 3000):
