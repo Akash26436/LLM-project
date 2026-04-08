@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.models import Base
+from app.database import agentic_models  # noqa: F401
 from app.database.session import engine
 
-from app.routers import auth, courses, assignments, quizzes, attendance, analytics, doubts, timetable
+from app.routers import auth, courses, assignments, quizzes, attendance, analytics, doubts, timetable, agentic_learning
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -27,6 +28,7 @@ app.include_router(attendance.router)
 app.include_router(analytics.router)
 app.include_router(doubts.router)
 app.include_router(timetable.router)
+app.include_router(agentic_learning.router)
 
 @app.get("/")
 def read_root():

@@ -15,6 +15,10 @@ class CourseCreate(BaseModel):
     duration: str = "4 weeks"
     syllabus_context: str = ""
 
+
+class JoinCourseByIdRequest(BaseModel):
+    classroom_id: int
+
 @router.get("/")
 def get_courses(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.role == "teacher":
@@ -56,6 +60,10 @@ def get_course_topics(course_id: int, db: Session = Depends(get_db)):
 def enroll_student(course_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can enroll")
+
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Classroom not found")
     
     existing = db.query(Enrollment).filter(Enrollment.student_id == current_user.id, Enrollment.course_id == course_id).first()
     if existing:
@@ -65,3 +73,25 @@ def enroll_student(course_id: int, db: Session = Depends(get_db), current_user: 
     db.add(enrollment)
     db.commit()
     return {"message": "Enrolled successfully"}
+
+
+@router.post("/join")
+def join_course_by_classroom_id(payload: JoinCourseByIdRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != "student":
+        raise HTTPException(status_code=403, detail="Only students can join classrooms")
+
+    course = db.query(Course).filter(Course.id == payload.classroom_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Classroom ID not found")
+
+    existing = db.query(Enrollment).filter(
+        Enrollment.student_id == current_user.id,
+        Enrollment.course_id == course.id,
+    ).first()
+    if existing:
+        return {"message": "Already enrolled", "classroom_id": course.id}
+
+    enrollment = Enrollment(student_id=current_user.id, course_id=course.id)
+    db.add(enrollment)
+    db.commit()
+    return {"message": "Joined classroom successfully", "classroom_id": course.id}

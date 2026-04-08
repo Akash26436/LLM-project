@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, BookOpen, Clock, Users, BarChart3, Settings, BrainCircuit } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Home,
+  BookOpen,
+  Clock,
+  Users,
+  BarChart3,
+  Settings,
+  BrainCircuit,
+  Sparkles,
+  LogOut,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const teacherNavigation = [
   { name: "Dashboard", href: "/dashboard/teacher", icon: Home },
+  { name: "AI Hub", href: "/ai-hub", icon: Sparkles },
   { name: "Courses", href: "/courses", icon: BookOpen },
   { name: "Attendance", href: "/attendance", icon: Users },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
@@ -15,14 +26,29 @@ const teacherNavigation = [
 
 const studentNavigation = [
   { name: "Dashboard", href: "/dashboard/student", icon: Home },
+  { name: "AI Hub", href: "/ai-hub", icon: Sparkles },
   { name: "My Courses", href: "/my-courses", icon: BookOpen },
   { name: "Assignments", href: "/assignments", icon: BookOpen },
   { name: "Timetable", href: "/timetable", icon: Clock },
 ];
 
-export default function Sidebar({ role = "teacher" }: { role?: "teacher" | "student" }) {
+export default function Sidebar({
+  role = "teacher",
+}: {
+  role?: "teacher" | "student";
+}) {
   const pathname = usePathname();
+  const router = useRouter();
   const navigation = role === "teacher" ? teacherNavigation : studentNavigation;
+
+  const handleLogout = () => {
+    // Clear any stored auth state (localStorage, cookies, etc.)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+    router.push("/");
+  };
 
   return (
     <div className="flex h-full w-64 flex-col glass border-r">
@@ -32,7 +58,7 @@ export default function Sidebar({ role = "teacher" }: { role?: "teacher" | "stud
           AgenticClass
         </span>
       </div>
-      
+
       <div className="flex flex-1 flex-col overflow-y-auto px-4 py-6">
         <nav className="flex-1 space-y-1">
           {navigation.map((item) => {
@@ -42,9 +68,7 @@ export default function Sidebar({ role = "teacher" }: { role?: "teacher" | "stud
                 key={item.name}
                 href={item.href}
                 className={`group relative flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ${
-                  isActive 
-                    ? "text-white" 
-                    : "text-zinc-400 hover:text-white"
+                  isActive ? "text-white" : "text-zinc-400 hover:text-white"
                 }`}
               >
                 {isActive && (
@@ -58,7 +82,9 @@ export default function Sidebar({ role = "teacher" }: { role?: "teacher" | "stud
                 )}
                 <item.icon
                   className={`mr-3 h-5 w-5 shrink-0 transition-colors z-10 ${
-                    isActive ? "text-primary" : "text-zinc-400 group-hover:text-white"
+                    isActive
+                      ? "text-primary"
+                      : "text-zinc-400 group-hover:text-white"
                   }`}
                   aria-hidden="true"
                 />
@@ -68,15 +94,28 @@ export default function Sidebar({ role = "teacher" }: { role?: "teacher" | "stud
           })}
         </nav>
       </div>
-      
-      <div className="border-t border-white/5 p-4 shrink-0">
+
+      <div className="border-t border-white/5 p-4 shrink-0 space-y-1">
         <Link
           href="/settings"
           className="group flex w-full items-center rounded-xl px-3 py-3 text-sm font-medium text-zinc-400 transition-colors hover:text-white"
         >
-          <Settings className="mr-3 h-5 w-5 shrink-0 text-zinc-400 group-hover:text-white" aria-hidden="true" />
+          <Settings
+            className="mr-3 h-5 w-5 shrink-0 text-zinc-400 group-hover:text-white"
+            aria-hidden="true"
+          />
           Settings
         </Link>
+        <button
+          onClick={handleLogout}
+          className="group flex w-full items-center rounded-xl px-3 py-3 text-sm font-medium text-zinc-400 transition-colors hover:text-red-400"
+        >
+          <LogOut
+            className="mr-3 h-5 w-5 shrink-0 text-zinc-400 group-hover:text-red-400"
+            aria-hidden="true"
+          />
+          Logout
+        </button>
       </div>
     </div>
   );
